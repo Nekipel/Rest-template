@@ -4,6 +4,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -21,11 +22,15 @@ public class Role implements GrantedAuthority {
     @Column(name="role")
     private String role;
 
-    @Transient
-    @ManyToMany
-    private Set<User> users;
+//    @Transient
+//    @ManyToMany(fetch = FetchType.LAZY)
+//    private Set<User> users;
 
     public Role() {
+    }
+    public Role(Long id, String role) {
+        this.id = id;
+        this.role = role;
     }
 
     public Role(String role) {
@@ -45,11 +50,11 @@ public class Role implements GrantedAuthority {
         this.role = role;
     }
 
-    public Set<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<User> users) {
-        this.users = users;
-    }
+//    public Set<User> getUsers() {
+//        return users;
+//    }
+//
+//    public void setUsers(Set<User> users) {
+//        this.users = users;
+//    }
 }

@@ -9,6 +9,7 @@ import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.service.UserServiceImpl;
 
 import java.security.Principal;
+import java.util.Collection;
 import java.util.Set;
 
 @Controller
@@ -25,7 +26,7 @@ public class AuthController {
     public String getUserPage(Model model, Principal principal) {
         String username = principal.getName();
         User user = personService.findByName(username);
-        Set<Role> roles = user.getRoles();
+        Collection<Role> roles = user.getRoles();
         model.addAttribute("user", user);
         model.addAttribute("roles", roles);
         return "/user";

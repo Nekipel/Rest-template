@@ -1,6 +1,8 @@
 package ru.kata.spring.boot_security.demo.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,19 +38,28 @@ public class User implements UserDetails {
     private int age;
 
     @ManyToMany(fetch = FetchType.LAZY)
+    @Fetch(FetchMode.JOIN)
     @JoinTable(name = "users_roles",
-            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
-    private Set<Role> roles;
+            joinColumns = {@JoinColumn(name = "user_id")},
+            inverseJoinColumns = {@JoinColumn(name = "role_id")})
+    private Collection<Role> roles;
+//    @ManyToMany(fetch = FetchType.LAZY)
+//    @JoinTable(name = "users_roles",
+//            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+//            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
+//    private Set<Role> roles;
 
     public User() {
     }
 
-    public User(String userName, String lastName, String password, int age) {
+    public User(String userName, String lastName, String password, int age
+            , Collection<Role> roles
+    ) {
         this.userName = userName;
         this.lastName = lastName;
         this.password = password;
         this.age = age;
+        this.roles = roles;
     }
 
     public String getLastName() {
@@ -59,11 +70,11 @@ public class User implements UserDetails {
         this.lastName = lastName;
     }
 
-    public Set<Role> getRoles() {
-        return roles;
+    public Collection<Role> getRoles() {
+        return this.roles;
     }
 
-    public void setRoles(Set<Role> roles) {
+    public void setRoles(Collection<Role> roles) {
         this.roles = roles;
     }
 
@@ -97,7 +108,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Set<Role> roles = getRoles();
+        Collection<Role> roles = getRoles();
         return roles.stream().map(r -> new SimpleGrantedAuthority(r.getRole())).collect(Collectors.toList());
     }
 

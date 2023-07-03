@@ -33,11 +33,11 @@ public class SetupDataLoader implements CommandLineRunner {
         adminRoles.add(roleUser);
         userRoles.add(roleUser);
 
-        User userAdmin = new User("admin","admin", "admin", 32);
-        User userUser = new User("user","user", "user", 32);
-        userAdmin.setRoles(adminRoles);
+        User userAdmin = new User("admin","admin", "admin", 32,adminRoles);
+        User userUser = new User("user","user", "user", 32,userRoles);
+//        userAdmin.setRoles(adminRoles);
         userService.save(userAdmin);
-        userUser.setRoles(userRoles);
+//        userUser.setRoles(userRoles);
         userService.save(userUser);
     }
 }
