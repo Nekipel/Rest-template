@@ -3,13 +3,10 @@ package ru.kata.spring.boot_security.demo.service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.kata.spring.boot_security.demo.model.Role;
 import ru.kata.spring.boot_security.demo.model.User;
 import ru.kata.spring.boot_security.demo.repository.UserRepository;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -36,18 +33,6 @@ public class UserServiceImpl implements UserService {
     public User getUser(Long id) {
         return userRepository.findById(id).get();
     }
-//    @Override
-//    @Transactional
-//    public void upDate(User user) {
-//        User oldUser = userRepository.findById(user.getId()).get();
-//        String oldPassword = oldUser.getPassword();
-//        if (user.getPassword() == null || user.getPassword().isEmpty()) {
-//            user.setPassword(oldPassword);
-//        } else {
-//            user.setPassword(passwordEncoder.encode(user.getPassword()));
-//        }
-//        userRepository.save(user);
-//    }
 
     @Override
     @Transactional
@@ -65,15 +50,16 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public void upDate(User user) {
-            Optional<User> userFromDB = userRepository.findById(user.getId());
-            String newPassword = user.getPassword();
-            String currentPassword = userFromDB.get().getPassword();
-
-            if (!currentPassword.equals(newPassword)) {
-                user.setPassword(passwordEncoder.encode(user.getPassword()));
-            }
-
-            userRepository.save(user);
+        User oldUser = userRepository.findById(user.getId()).get();
+        String oldPassword = oldUser.getPassword();
+        if (user.getPassword() == null
+                || user.getPassword().isEmpty()
+                || user.getPassword().equals(oldUser.getPassword())) {
+            user.setPassword(oldPassword);
+        } else {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
+        userRepository.save(user);
+    }
 }
 

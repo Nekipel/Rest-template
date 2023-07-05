@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
     @Column(name="Username")
     private String userName;
@@ -38,23 +39,13 @@ public class User implements UserDetails {
     private int age;
 
     @ManyToMany(fetch = FetchType.LAZY)
-    @Fetch(FetchMode.JOIN)
-    @JoinTable(name = "users_roles",
-            joinColumns = {@JoinColumn(name = "user_id")},
-            inverseJoinColumns = {@JoinColumn(name = "role_id")})
-    private Collection<Role> roles;
-//    @ManyToMany(fetch = FetchType.LAZY)
-//    @JoinTable(name = "users_roles",
-//            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
-//            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
-//    private Set<Role> roles;
+    @JoinColumn(referencedColumnName = "user_id")
+    private Set<Role> roles;
 
     public User() {
     }
 
-    public User(String userName, String lastName, String password, int age
-            , Collection<Role> roles
-    ) {
+    public User(String userName, String lastName, String password, int age, Set<Role> roles) {
         this.userName = userName;
         this.lastName = lastName;
         this.password = password;
@@ -70,11 +61,11 @@ public class User implements UserDetails {
         this.lastName = lastName;
     }
 
-    public Collection<Role> getRoles() {
+    public Set<Role> getRoles() {
         return this.roles;
     }
 
-    public void setRoles(Collection<Role> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 
@@ -108,8 +99,9 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<Role> roles = getRoles();
-        return roles.stream().map(r -> new SimpleGrantedAuthority(r.getRole())).collect(Collectors.toList());
+//        Set<Role> roles = getRoles();
+        return getRoles();
+//        return roles.stream().map(r -> new SimpleGrantedAuthority(r.getRole())).collect(Collectors.toList());
     }
 
     @Override

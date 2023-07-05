@@ -1,5 +1,4 @@
 const url = 'http://localhost:8080/api/admin';
-const roleList = [];
 
 async function getUsers() {
     const response = await fetch(url, {
@@ -11,18 +10,6 @@ async function getUsers() {
         getTable(users)
         }
 }
-
-function getRoles() {
-    fetch("http://localhost:8080/api/roles")
-        .then(response => response.json())
-        .then(roles => {
-            roles.forEach(role => {
-                roleList.push(role)
-            })
-        })
-}
-
-getRoles();
 
 function getTable(users) {
     let res = '';
@@ -51,28 +38,35 @@ getUsers()
 
 //Редактирование пользователя
 function editModal(id) {
-    fetch(url + '/' + id, {
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json;charset=UTF-8'
-        }
-    }).then(res => {
-        res.json().then(u => {
+
+    fetch(url + '/' + id,)
+        .then(res => {res.json()
+            .then(u => {
             document.getElementById('idEdit').value = u.id;
             document.getElementById('nameEdit').value = u.userName;
             document.getElementById('lastNameEdit').value = u.lastName;
             document.getElementById('ageEdit').value = u.age;
             document.getElementById('passEdit').value = u.password;
-            // document.getElementById('rolesEdit').options = u.roles;
         })
     });
+    let roleSelect = document.getElementById("rolesEdit");
+    fetch("http://localhost:8080/api/roles")
+        .then(response => response.json())
+        .then(roles => {
+            roles.forEach((role, i = 0) => {
+                let el = document.createElement("option");
+                el.value = i+1;
+                el.text = role.role.substring(5);
+                roleSelect.append(el);
+            })
+        })
 }
+
 function closeModal() {
     document.querySelectorAll(".btn-close").forEach((btn) => btn.click())
 }
 
 async function editUser() {
-    // const form_ed = document.getElementById('modalEdit');
     let idValue = document.getElementById("idEdit").value;
     let nameValue = document.getElementById("nameEdit").value;
     let lastNameValue = document.getElementById("lastNameEdit").value;
@@ -80,16 +74,13 @@ async function editUser() {
     let passwordValue = document.getElementById("passEdit").value;
     let roleSelect = document.getElementById("rolesEdit");
 
-
-    let listOfRole = [];
-    let roleOptions = roleSelect.options;
-    const role = id == 1 ? `ROLE_USER` : `ROLE_ADMIN`
-    for (let i = 0; i < roleOptions.length; i++) {
-        if (roleOptions[i].selected) {
-            listOfRole.push({
-                id: i++,
-                name: role
-            });
+    let newUserRoles = [];
+    for (let i = 0; i < roleSelect.options.length; i++) {
+        if (roleSelect.options[i].selected) {
+            newUserRoles.push({
+                id: roleSelect.options[i].value,
+                role: roleSelect.options[i].text
+            })
         }
     }
     let user = {
@@ -98,14 +89,14 @@ async function editUser() {
         lastName: lastNameValue,
         age: ageValue,
         password: passwordValue,
-        roles: listOfRole
+        roles: newUserRoles,
     }
 
 
     await fetch(url + '/' + user.id, {
         method: "PATCH",
         headers: {
-            'Accept': 'application/json',
+            // 'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(user)
